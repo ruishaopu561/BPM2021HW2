@@ -3,7 +3,8 @@
 
 ## 项目构建
 ```bash
-vue init webpack trip-web
+# 实际这一步下载的 release
+git clone git@github.com:iczer/vue-antd-admin.git
 cd trip-web
 npm install ant-design-vue --save
 npm install babel-plugin-import --dev
