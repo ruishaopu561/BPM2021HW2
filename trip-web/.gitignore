@@ -1,17 +1,13 @@
 .DS_Store
 node_modules/
-/dist/
+dist/
+admindb/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 /test/unit/coverage/
-test
-
-package-lock.json
-.editorconfig
-.eslintignore
-.eslintrc.js
-.postcssrc.js
+/test/e2e/reports/
+selenium-debug.log
 
 # Editor directories and files
 .idea
@@ -20,3 +16,13 @@ package-lock.json
 *.ntvs*
 *.njsproj
 *.sln
+package-lock.json
+.env.production.local
+
+.github
+docs
+yarn.lock
+README.en-US.md
+LICENSE
+.env
+.env.*
