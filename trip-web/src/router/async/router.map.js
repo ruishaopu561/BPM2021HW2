@@ -40,6 +40,10 @@ const routerMap = {
     name: '历史订单',
     component: () => import('@/pages/order/HistoryOrder')
   },
+  orderDetail: {
+    name: '订单详情',
+    component: () => import('@/pages/order/OrderDetail')
+  },
   dashboard: {
     name: 'Dashboard',
     component: view.blank
