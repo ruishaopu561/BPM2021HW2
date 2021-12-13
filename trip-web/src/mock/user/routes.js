@@ -7,6 +7,14 @@ Mock.mock(`${process.env.VUE_APP_API_BASE_URL}/routes`, 'get', () => {
     router: 'root',
     children: [
       {
+        router: 'user',
+        children: ['Person']
+      },
+      {
+        router: 'order',
+        children: ['processOrder', 'historyOrder']
+      },
+      {
         router: 'dashboard',
         children: ['workplace', 'analysis'],
       },

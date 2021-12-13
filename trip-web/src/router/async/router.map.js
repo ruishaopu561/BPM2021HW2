@@ -18,6 +18,28 @@ const routerMap = {
     redirect: '/login',
     component: view.tabs
   },
+  user: {
+    name: '用户管理',
+    icon: 'list',
+    component: view.page
+  },
+  person: {
+    name: '个人信息',
+    component: () => import('@/pages/user/Person')
+  },
+  order: {
+    name: '订单管理',
+    icon: 'list',
+    component: view.page
+  },
+  processOrder: {
+    name: '预约订单',
+    component: () => import('@/pages/order/ProcessOrder')
+  },
+  historyOrder: {
+    name: '历史订单',
+    component: () => import('@/pages/order/HistoryOrder')
+  },
   dashboard: {
     name: 'Dashboard',
     component: view.blank
