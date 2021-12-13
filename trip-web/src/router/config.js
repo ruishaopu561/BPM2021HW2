@@ -26,6 +26,42 @@ const options = {
       component: TabsView,
       redirect: '/login',
       children: [
+        
+        {
+          path: 'user',
+          name: '用户管理',
+          meta: {
+            icon: 'profile'
+          },
+          component: BlankView,
+          children: [
+            {
+              path: 'person',
+              name: '个人信息',
+              component: () => import('@/pages/user/Person'),
+            }
+          ]
+        },
+        {
+          path: 'order',
+          name: '订单管理',
+          meta: {
+            icon: 'table'
+          },
+          component: PageView,
+          children: [
+            {
+              path: 'process',
+              name: '预约订单',
+              component: () => import('@/pages/order/ProcessOrder'),
+            },
+            {
+              path: 'history',
+              name: '历史订单',
+              component: () => import('@/pages/order/HistoryOrder'),
+            }
+          ]
+        },
         {
           path: 'dashboard',
           name: 'Dashboard',
@@ -37,11 +73,6 @@ const options = {
             {
               path: 'workplace',
               name: '工作台',
-              meta: {
-                page: {
-                  closable: false
-                }
-              },
               component: () => import('@/pages/dashboard/workplace'),
             },
             {
