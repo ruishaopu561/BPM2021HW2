@@ -24,5 +24,3 @@ docs
 yarn.lock
 README.en-US.md
 LICENSE
-.env
-.env.*
