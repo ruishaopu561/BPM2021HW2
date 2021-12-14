@@ -6,71 +6,73 @@
           <a-row >
           <a-col :md="8" :sm="24" >
             <a-form-item
-              label="规则编号"
+              label="订单编号"
               :labelCol="{span: 5}"
               :wrapperCol="{span: 18, offset: 1}"
             >
-              <a-input placeholder="请输入" />
+              <a-input v-model="searchForm.no" placeholder="请输入" />
             </a-form-item>
           </a-col>
           <a-col :md="8" :sm="24" >
             <a-form-item
-              label="使用状态"
+              label="用户名称"
               :labelCol="{span: 5}"
               :wrapperCol="{span: 18, offset: 1}"
             >
-              <a-select placeholder="请选择">
-                <a-select-option value="1">关闭</a-select-option>
-                <a-select-option value="2">运行中</a-select-option>
-              </a-select>
+              <a-input v-model="searchForm.username" placeholder="请输入" />
             </a-form-item>
           </a-col>
           <a-col :md="8" :sm="24" >
             <a-form-item
-              label="调用次数"
+              label="预约日期"
               :labelCol="{span: 5}"
               :wrapperCol="{span: 18, offset: 1}"
             >
-              <a-input-number style="width: 100%" placeholder="请输入" />
+              <a-date-picker @change="handleDatechange" style="width: 100%" placeholder="请输入日期" />
             </a-form-item>
           </a-col>
         </a-row>
           <a-row v-if="advanced">
           <a-col :md="8" :sm="24" >
             <a-form-item
-              label="更新日期"
+              label="房型"
               :labelCol="{span: 5}"
               :wrapperCol="{span: 18, offset: 1}"
             >
-              <a-date-picker style="width: 100%" placeholder="请输入更新日期" />
-            </a-form-item>
-          </a-col>
-          <a-col :md="8" :sm="24" >
-            <a-form-item
-              label="使用状态"
-              :labelCol="{span: 5}"
-              :wrapperCol="{span: 18, offset: 1}"
-            >
-              <a-select placeholder="请选择">
-                <a-select-option value="1">关闭</a-select-option>
-                <a-select-option value="2">运行中</a-select-option>
+              <a-select @change="handleTypeChange" placeholder="请选择">
+                <a-select-option value="1">单人标间</a-select-option>
+                <a-select-option value="2">双人标间</a-select-option>
+                <a-select-option value="3">家庭套房</a-select-option>
+                <a-select-option value="4">VIP套房</a-select-option>
               </a-select>
             </a-form-item>
           </a-col>
           <a-col :md="8" :sm="24" >
             <a-form-item
-              label="描述"
+              label="数量"
               :labelCol="{span: 5}"
               :wrapperCol="{span: 18, offset: 1}"
             >
-              <a-input placeholder="请输入" />
+              <a-input-number v-model="searchForm.number" style="width: 100%" placeholder="请输入" />
+            </a-form-item>
+          </a-col>
+          <a-col :md="8" :sm="24" >
+            <a-form-item
+              label="订单状态"
+              :labelCol="{span: 5}"
+              :wrapperCol="{span: 18, offset: 1}"
+            >
+              <a-select @change="handleStatusChange" placeholder="请选择">
+                <a-select-option value="1">预约中</a-select-option>
+                <a-select-option value="2">已处理</a-select-option>
+              </a-select>
             </a-form-item>
           </a-col>
         </a-row>
         </div>
         <span style="float: right; margin-top: 3px;">
-          <a-button type="primary">查询</a-button>
-          <a-button style="margin-left: 8px">重置</a-button>
+          <a-button type="primary" @click="search()">查询</a-button>
+          <a-button style="margin-left: 8px" @click="reset()">重置</a-button>
           <a @click="toggleAdvanced" style="margin-left: 8px">
             {{advanced ? '收起' : '展开'}}
             <a-icon :type="advanced ? 'up' : 'down'" />
@@ -80,17 +82,7 @@
     </div>
     <div>
       <a-space class="operator">
-        <a-button @click="addNew" type="primary">新建</a-button>
-        <a-button >批量操作</a-button>
-        <a-dropdown>
-          <a-menu @click="handleMenuClick" slot="overlay">
-            <a-menu-item key="delete">删除</a-menu-item>
-            <a-menu-item key="audit">审批</a-menu-item>
-          </a-menu>
-          <a-button>
-            更多操作 <a-icon type="down" />
-          </a-button>
-        </a-dropdown>
+        <a-button @click="handleMultiAddress()">批量处理</a-button>
       </a-space>
       <standard-table
         :columns="columns"
@@ -103,24 +95,20 @@
         <div slot="description" slot-scope="{text}">
           {{text}}
         </div>
-        <div slot="action" slot-scope="{text, record}">
-          <a style="margin-right: 8px">
-            <a-icon type="plus"/>新增
+        <div slot="action" slot-scope="{record}">
+          <a @click="address(record.key)" style="margin-right: 8px">
+            <a-icon type="edit"/>处理
           </a>
-          <a style="margin-right: 8px">
-            <a-icon type="edit"/>编辑
+          <a @click="finish(record.key)" style="margin-right: 8px">
+            <a-icon type="check"/>完成
           </a>
-          <a @click="deleteRecord(record.key)">
-            <a-icon type="delete" />删除1
+          <a @click="deleteRecord(record.key)" style="margin-right: 8px">
+            <a-icon type="delete"/>删除
           </a>
-          <a @click="deleteRecord(record.key)" v-auth="`delete`">
-            <a-icon type="delete" />删除2
+          <a @click="handleRecordDetail(record.key)">
+            <a-icon type="link"/>详情
           </a>
-          <router-link :to="`/list/query/detail/${record.key}`" >详情</router-link>
         </div>
-        <template slot="statusTitle">
-          <a-icon @click.native="onStatusTitleClick" type="info-circle" />
-        </template>
       </standard-table>
     </div>
   </a-card>
@@ -128,10 +116,36 @@
 
 <script>
 import StandardTable from '@/components/table/StandardTable'
+import {mapMutations} from 'vuex'
+
 const columns = [
   {
-    title: '规则编号',
+    title: '订单编号',
     dataIndex: 'no'
+  },
+  {
+    title: '用户名称',
+    dataIndex: 'username',
+    sorter: true
+  },
+  {
+    title: '预约日期',
+    dataIndex: 'ordertime',
+    sorter: true
+  },
+  {
+    title: '房型',
+    dataIndex: 'type',
+    sorter: true
+  },
+  {
+    title: '数量',
+    dataIndex: 'number',
+  },
+  {
+    title: '状态',
+    dataIndex: 'status',
+    needTotal: true,
   },
   {
     title: '描述',
@@ -139,54 +153,49 @@ const columns = [
     scopedSlots: { customRender: 'description' }
   },
   {
-    title: '服务调用次数',
-    dataIndex: 'callNo',
-    sorter: true,
-    needTotal: true,
-    customRender: (text) => text + ' 次'
-  },
-  {
-    dataIndex: 'status',
-    needTotal: true,
-    slots: {title: 'statusTitle'}
-  },
-  {
-    title: '更新时间',
-    dataIndex: 'updatedAt',
-    sorter: true
-  },
-  {
     title: '操作',
     scopedSlots: { customRender: 'action' }
   }
 ]
 
-const dataSource = []
+const users = ['张三', '李四', '王五', '马六']
+const types = ['单人标间', '双人标间', '家庭套房', 'VIP套房']
+const statuss = ['预约中', '已处理']
+let dataList = []
 
-for (let i = 0; i < 100; i++) {
-  dataSource.push({
+for (let i = 1; i < 8; i++) {
+  dataList.push({
     key: i,
     no: 'NO ' + i,
+    username: users[Math.floor(Math.random() * 10) % 4],
+    ordertime: '2021-' + (Math.floor(Math.random() * 11) + 1)
+               + '-' + (Math.floor(Math.random() * 27) + 1),
+    status: statuss[Math.floor(Math.random() * 10) % 2],
+    type: types[Math.floor(Math.random() * 10) % 4],
+    number: Math.floor(Math.random() * 3) + 1,
     description: '这是一段描述',
-    callNo: Math.floor(Math.random() * 1000),
-    status: Math.floor(Math.random() * 10) % 4,
-    updatedAt: '2018-07-26'
   })
 }
 
 export default {
-  name: 'historyOrder',
+  name: 'processOrder',
   components: {StandardTable},
   data () {
     return {
       advanced: true,
       columns: columns,
-      dataSource: dataSource,
-      selectedRows: []
+      dataSource: dataList,
+      selectedRows: [],
+      searchForm: {
+        no: '',
+        username: '',
+        date: '',
+        status: '',
+        type: 0,
+        number: 0,
+        desc: ''
+      }
     }
-  },
-  authorize: {
-    deleteRecord: 'delete'
   },
   computed: {
     desc() {
@@ -194,43 +203,84 @@ export default {
     }
   },
   methods: {
-    deleteRecord(key) {
+    ...mapMutations('order', ['setHistory', 'setDetail']),
+    address(key) {
+      for(var i=0; i < this.dataSource.length; i++) {
+        if (this.dataSource[i].key == key) {
+          this.dataSource[i].status = statuss[1]
+        }
+      }
+    },
+    finish(key) {
+      // 如果要不断添加到历史订单页面的话，每次添加之前都要确保历史订单页面关闭
+      let data = this.dataSource.filter(item => item.key === key)[0]
       this.dataSource = this.dataSource.filter(item => item.key !== key)
+      if (data.status === statuss[0]) {
+        this.$message.warn('该订单还未处理')
+      } else {
+        data.status = '已结束'
+        this.setHistory(data)
+      }
+    },
+    deleteRecord(key) {
+      dataList = dataList.filter(item => item.key !== key)
+      this.dataSource = dataList
       this.selectedRows = this.selectedRows.filter(item => item.key !== key)
+    },
+    handleRecordDetail(key) {
+      const detail = this.dataSource.filter(item => item.key === key)[0]
+      this.setDetail(detail)
+      this.$router.push({path:'/order/detail'})
+    },
+    handleTypeChange(text) {
+      this.searchForm.type = text
+    },
+    handleStatusChange(status) {
+      this.searchForm.status = statuss[status - 1]
+      console.log(this.searchForm.status)
+    },
+    handleDatechange(_, dateString) {
+      this.searchForm.date = dateString
+    },
+    search() {
+      var key = this.searchForm.status
+      if (key != '') {
+        this.dataSource = dataList.filter(item => item.status === key)
+      } else {
+        this.dataSource = dataList
+      }
+    },
+    reset() {
+      this.searchForm.no = ''
+      this.searchForm.username = ''
+      this.searchForm.number = 0
+      this.searchForm.status = 0
+      this.searchForm.type = 0
+      this.searchForm.date = ''
+      this.searchForm.desc = ''
     },
     toggleAdvanced () {
       this.advanced = !this.advanced
     },
     remove () {
-      this.dataSource = this.dataSource.filter(item => this.selectedRows.findIndex(row => row.key === item.key) === -1)
+      dataList = dataList.filter(item => this.selectedRows.findIndex(row => row.key === item.key) === -1)
+      this.dataSource = dataList
       this.selectedRows = []
     },
     onClear() {
-      this.$message.info('您清空了勾选的所有行')
+      console.log('您清空了勾选的所有行')
     },
     onStatusTitleClick() {
-      this.$message.info('你点击了状态栏表头')
+      console.log('你点击了状态栏表头')
     },
     onChange() {
-      this.$message.info('表格状态改变了')
+      console.log('表格状态改变了')
     },
     onSelectChange() {
-      this.$message.info('选中行改变了')
+      console.log('选中行改变了')
     },
-    addNew () {
-      this.dataSource.unshift({
-        key: this.dataSource.length,
-        no: 'NO ' + this.dataSource.length,
-        description: '这是一段描述',
-        callNo: Math.floor(Math.random() * 1000),
-        status: Math.floor(Math.random() * 10) % 4,
-        updatedAt: '2018-07-26'
-      })
-    },
-    handleMenuClick (e) {
-      if (e.key === 'delete') {
-        this.remove()
-      }
+    handleMenuClick () {
+      this.remove()
     }
   }
 }

@@ -24,7 +24,7 @@
           </a-col>
           <a-col :md="8" :sm="24" >
             <a-form-item
-              label="结束日期"
+              label="预约日期"
               :labelCol="{span: 5}"
               :wrapperCol="{span: 18, offset: 1}"
             >
@@ -97,12 +97,9 @@
             <a-icon type="delete" />删除
           </a>
           <a @click="handleRecordDetail(text.key)">
-            详情
+            <a-icon type="link"/>详情
           </a>
         </div>
-        <template slot="statusTitle">
-          <a-icon @click.native="onStatusTitleClick" type="info-circle" />
-        </template>
       </standard-table>
     </div>
   </a-card>
@@ -110,6 +107,7 @@
 
 <script>
 import StandardTable from '@/components/table/StandardTable'
+import {mapState, mapMutations} from 'vuex'
 
 const columns = [
   {
@@ -122,8 +120,8 @@ const columns = [
     sorter: true
   },
   {
-    title: '结束时间',
-    dataIndex: 'endtime',
+    title: '预约日期',
+    dataIndex: 'ordertime',
     sorter: true
   },
   {
@@ -155,17 +153,17 @@ const users = ['张三', '李四', '王五', '马六']
 const types = ['单人标间', '双人标间', '家庭套房', 'VIP套房']
 let dataList = []
 
-for (let i = 1; i < 15; i++) {
+for (let i = 8; i < 15; i++) {
   dataList.push({
     key: i,
     no: 'NO ' + i,
     username: users[Math.floor(Math.random() * 10) % 4],
-    endtime: '2021-' + (Math.floor(Math.random() * 11) + 1)
+    ordertime: '2021-' + (Math.floor(Math.random() * 11) + 1)
                + '-' + (Math.floor(Math.random() * 27) + 1),
-    description: '这是一段描述',
     status: '已结束',
     type: types[Math.floor(Math.random() * 10) % 4],
-    number: Math.floor(Math.random() * 4),
+    number: Math.floor(Math.random() * 3) + 1,
+    description: '这是一段描述',
   })
 }
 
@@ -189,24 +187,22 @@ export default {
     }
   },
   computed: {
+    ...mapState('order', ['history']),
     desc() {
       return this.$t('展示和查询历史订单')
     }
   },
   methods: {
+    ...mapMutations('order', ['setDetail']),
     deleteRecord(key) {
       dataList = dataList.filter(item => item.key !== key)
       this.dataSource = dataList
       this.selectedRows = this.selectedRows.filter(item => item.key !== key)
     },
     handleRecordDetail(key) {
-      const detail = this.dataSource[key]
-      this.$router.push({
-        path:'/order/detail',
-        query: {
-          orderDetail: detail
-        }
-      })
+      const detail = this.dataSource.filter(item => item.key === key)[0]
+      this.setDetail(detail)
+      this.$router.push({path:'/order/detail'})
     },
     handleTypeChange(text) {
       this.searchForm.type = text
@@ -245,20 +241,29 @@ export default {
       this.selectedRows = []
     },
     onClear() {
-      this.$message.info('您清空了勾选的所有行')
+      console.log('您清空了勾选的所有行')
     },
     onStatusTitleClick() {
-      this.$message.info('你点击了状态栏表头')
+      console.log('你点击了状态栏表头')
     },
     onChange() {
-      this.$message.info('表格状态改变了')
+      console.log('表格状态改变了')
     },
     onSelectChange() {
-      this.$message.info('选中行改变了')
+      console.log('选中行改变了')
     },
     handleMultiRemove() {
       this.remove()
-    }
+    },
+  },
+  mounted() {
+    var that = this
+    setInterval(()=> {
+      let data = that.dataSource.filter(item => item.key === that.history.key)
+      if (data.length <= 0) {
+        that.dataSource.push(that.history)
+      }
+    }, 1000)
   }
 }
 </script>
