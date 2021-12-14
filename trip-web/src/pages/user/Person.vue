@@ -35,7 +35,7 @@
         </detail-list>
       </a-card>
       <a-card style="margin-top: 24px" :bordered="false" title="风采展示">
-        <a-carousel autoplay arrows dots-class="slick-slide slick-dots slick-thumb">
+        <a-carousel autoplay dots-class="slick-slide slick-dots slick-thumb">
             <div><img src='@/assets/img/abstract01.jpg'/></div>
             <div><img src='@/assets/img/abstract02.jpg'/></div>
             <div><img src='@/assets/img/abstract03.jpg'/></div>
@@ -82,6 +82,7 @@ margin-bottom: 16px;
   border: 5px solid #fff;
   display: block;
   margin: auto;
+  height: 240px;
   max-width: 80%;
 }
 .ant-carousel .slick-thumb {

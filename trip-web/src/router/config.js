@@ -59,6 +59,11 @@ const options = {
               path: 'history',
               name: '历史订单',
               component: () => import('@/pages/order/HistoryOrder'),
+            },
+            {
+              path: 'detail',
+              name: '订单详情',
+              component: () => import('@/pages/order/OrderDetail'),
             }
           ]
         },
