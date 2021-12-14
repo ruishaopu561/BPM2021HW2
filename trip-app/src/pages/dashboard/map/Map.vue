@@ -1,0 +1,150 @@
+/* eslint-disable */ 
+
+<template>
+  <page-layout :avatar="currUser.avatar">
+    <div class="components-input-demo-presuffix">
+      <a-row type="flex" justify="space-around" align="middle">
+        <a-col :span="10">
+          <a-input
+            size="large"
+            v-model="source.name"
+            placeholder="请输入起始点"
+            @focus.native="inputFocus = 'source'"
+            @blur.native="inputFocus = ''"
+          />
+        </a-col>
+        <a-col :span="10">
+          <a-input
+            size="large"
+            v-model="destination.name"
+            placeholder="请输入目的地"
+            @focus.native="inputFocus = 'destination'"
+            @blur.native="inputFocus = ''"
+          />
+        </a-col>
+        <a-col :span="1">
+          <a-button type="primary" shape="circle" icon="search" @click="onSearch"/>
+        </a-col>
+      </a-row>
+      <!-- <a-input ref="userNameInput"  >
+        <a-tooltip slot="suffix" title="Extra information">
+          <a-icon type="info-circle" style="color: rgba(0, 0, 0, 0.45)" />
+        </a-tooltip>
+      </a-input> -->
+    </div>
+    <br />
+    <div id="container" onload></div>
+    <div>
+      POI:
+      <span>{{
+        curPoi.name + "(" + curPoi.latLng.lat + "," + curPoi.latLng.lng + ")"
+      }}</span>
+    </div>
+  </page-layout>
+</template>
+
+<script>
+import PageLayout from "@/layouts/PageLayout";
+import { mapActions, mapState } from "vuex";
+import { request, METHOD } from "@/utils/request";
+import { routePlanToPolygon, drawRoute } from "@/utils/map";
+
+export default {
+  name: "WorkPlace",
+  components: { PageLayout },
+  i18n: require("./i18n"),
+  data() {
+    return {
+      loading: true,
+      activities: [],
+      source: "",
+      destination: "",
+      map: null,
+      curPoi: {
+        name: "",
+        latLng: {
+          lat: null,
+          lng: null,
+        },
+      },
+      inputFocus: "",
+      activeGraph: null,
+    };
+  },
+  computed: {
+    ...mapState("account", { currUser: "user" }),
+    ...mapState("setting", ["lang"]),
+    ...mapState({
+      KEY: (state) => state.user.MAP_API_KEY,
+      defaultStartPos: (state) => state.user.defaultStartPos,
+    }),
+  },
+  methods: {
+    ...mapActions(["getRoutePlanAction"]),
+    async onSearch() {
+      if (this.activeGraph) {
+        this.activeGraph.marker.setMap(null)
+        this.activeGraph.polylineLayer.setMap(null)
+        this.activeGraph = null
+      }
+      let source = this.source.latLng
+      let destination = this.destination.latLng;
+      let route = { startPos: source, endPos: destination };
+      let ret = await this.getRoutePlanAction(route);
+
+      let pl = routePlanToPolygon(ret);
+
+      let { marker, polylineLayer } = drawRoute(pl, route.startPos, route.endPos, this.map);
+      this.activeGraph = { marker, polylineLayer }
+    },
+  },
+  created() {
+    request("/user/welcome", METHOD.GET).then(
+      (res) => (this.welcome = res.data)
+    );
+    request("/work/activity", METHOD.GET).then(
+      (res) => (this.activities = res.data)
+    );
+  },
+  mounted() {
+    var center = new window.TMap.LatLng(31.025633, 121.437096);
+    this.map = new window.TMap.Map("container", {
+      rotation: 20, //设置地图旋转角度
+      pitch: 0, //设置俯仰角度（0~45）
+      zoom: 14, //设置地图缩放级别
+      center: center, //设置地图中心点坐标
+    });
+
+    // 创建信息窗
+    // let info = new window.TMap.InfoWindow({
+    //   map: this.map,
+    //   position: this.map.getCenter(),
+    // }).close();
+    this.map.on("click", (evt) => {
+      // 获取click事件返回的poi信息
+      let poi = evt.poi;
+      if (poi) {
+        // 拾取到POI
+        // info.setContent(poi.name).setPosition(poi.latLng).open();
+        this.curPoi = poi;
+        if (this.inputFocus === 'source')
+          this.source = poi
+        else if (this.inputFocus === 'destination')
+          this.destination = poi
+      } else {
+        // 没有拾取到POI
+        // info.close();
+      }
+    });
+  },
+  watch: {
+    inputFocus () {
+      console.log(this.inputFocus)
+    }
+  }
+};
+</script>
+
+<style lang="less">
+@import "index";
+</style>

@@ -48,6 +48,11 @@ const options = {
               path: 'analysis',
               name: '分析页',
               component: () => import('@/pages/dashboard/analysis'),
+            },
+            {
+              path: 'map',
+              name: '地图',
+              component: () => import('@/pages/dashboard/map')
             }
           ]
         },

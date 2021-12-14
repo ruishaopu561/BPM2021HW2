@@ -30,6 +30,10 @@ const routerMap = {
     name: '分析页',
     component: () => import('@/pages/dashboard/analysis')
   },
+  map: {
+    name: '地图',
+    component: () => import('@/pages/dashboard/map')
+  },
   form: {
     name: '表单页',
     icon: 'form',
