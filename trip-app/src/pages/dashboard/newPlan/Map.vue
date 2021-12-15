@@ -1,5 +1,3 @@
-/* eslint-disable */ 
-
 <template>
   <page-layout :avatar="currUser.avatar">
     <div class="components-input-demo-presuffix">
@@ -23,7 +21,12 @@
           />
         </a-col>
         <a-col :span="1">
-          <a-button type="primary" shape="circle" icon="search" @click="onSearch"/>
+          <a-button
+            type="primary"
+            shape="circle"
+            icon="search"
+            @click="onSearch"
+          />
         </a-col>
       </a-row>
       <!-- <a-input ref="userNameInput"  >
@@ -33,24 +36,32 @@
       </a-input> -->
     </div>
     <br />
-    <div id="container" onload></div>
+    <!-- // FIXME: 地图div会和展开的navigation重叠，导致用不了navigation -->
+    <div id="container"></div>
     <div>
       POI:
       <span>{{
         curPoi.name + "(" + curPoi.latLng.lat + "," + curPoi.latLng.lng + ")"
       }}</span>
     </div>
+    <a-row type="flex" justify="space-around" align="middle">
+      <a-col>
+        <a-button type="primary" @click="nextStep">{{
+          $t("nextStep")
+        }}</a-button>
+      </a-col>
+    </a-row>
   </page-layout>
 </template>
 
 <script>
 import PageLayout from "@/layouts/PageLayout";
-import { mapActions, mapState } from "vuex";
+import { mapActions, mapMutations, mapState } from "vuex";
 import { request, METHOD } from "@/utils/request";
 import { routePlanToPolygon, drawRoute } from "@/utils/map";
 
 export default {
-  name: "WorkPlace",
+  name: "Map",
   components: { PageLayout },
   i18n: require("./i18n"),
   data() {
@@ -80,22 +91,31 @@ export default {
     }),
   },
   methods: {
+    ...mapMutations(["setMap", "setRoutePoint"]),
     ...mapActions(["getRoutePlanAction"]),
     async onSearch() {
       if (this.activeGraph) {
-        this.activeGraph.marker.setMap(null)
-        this.activeGraph.polylineLayer.setMap(null)
-        this.activeGraph = null
+        // .setGeometries([])
+        this.activeGraph.marker.setMap(null);
+        this.activeGraph.polylineLayer.setMap(null);
+        this.activeGraph = null;
       }
-      let source = this.source.latLng
+      let source = this.source.latLng;
       let destination = this.destination.latLng;
       let route = { startPos: source, endPos: destination };
       let ret = await this.getRoutePlanAction(route);
 
       let pl = routePlanToPolygon(ret);
 
-      let { marker, polylineLayer } = drawRoute(pl, route.startPos, route.endPos, this.map);
-      this.activeGraph = { marker, polylineLayer }
+      let { marker, polylineLayer } = drawRoute(
+        { pl, startPos: route.startPos, endPos: route.endPos },
+        this.map
+      );
+      this.activeGraph = { marker, polylineLayer };
+      this.setRoutePoint({ pl, startPos: source, endPos: destination });
+    },
+    nextStep() {
+      this.$emit("nextStep");
     },
   },
   created() {
@@ -107,7 +127,7 @@ export default {
     );
   },
   mounted() {
-    var center = new window.TMap.LatLng(31.025633, 121.437096);
+    let center = new window.TMap.LatLng(31.025633, 121.437096);
     this.map = new window.TMap.Map("container", {
       rotation: 20, //设置地图旋转角度
       pitch: 0, //设置俯仰角度（0~45）
@@ -127,21 +147,25 @@ export default {
         // 拾取到POI
         // info.setContent(poi.name).setPosition(poi.latLng).open();
         this.curPoi = poi;
-        if (this.inputFocus === 'source')
-          this.source = poi
-        else if (this.inputFocus === 'destination')
-          this.destination = poi
+        if (this.inputFocus === "source") {
+          console.log("source");
+          this.source = poi;
+        } else if (this.inputFocus === "destination") {
+          console.log("destination");
+          this.destination = poi;
+        }
       } else {
         // 没有拾取到POI
         // info.close();
       }
     });
+    this.setMap(this.map);
   },
   watch: {
-    inputFocus () {
-      console.log(this.inputFocus)
-    }
-  }
+    inputFocus(value) {
+      console.log(value);
+    },
+  },
 };
 </script>
 

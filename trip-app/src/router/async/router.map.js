@@ -31,8 +31,8 @@ const routerMap = {
     component: () => import('@/pages/dashboard/analysis')
   },
   map: {
-    name: '地图',
-    component: () => import('@/pages/dashboard/map')
+    name: '计划新旅程',
+    component: () => import('@/pages/dashboard/newPlan')
   },
   form: {
     name: '表单页',

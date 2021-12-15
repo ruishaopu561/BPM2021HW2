@@ -50,9 +50,9 @@ const options = {
               component: () => import('@/pages/dashboard/analysis'),
             },
             {
-              path: 'map',
-              name: '地图',
-              component: () => import('@/pages/dashboard/map')
+              path: 'newPlan',
+              name: '计划新旅程',
+              component: () => import('@/pages/dashboard/newPlan')
             }
           ]
         },

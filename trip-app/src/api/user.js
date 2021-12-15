@@ -1,5 +1,5 @@
 import { request, METHOD } from "@/utils/request";
-import store from "../store/index";
+// import store from "../store/index";
 
 /**
  *

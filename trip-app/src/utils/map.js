@@ -13,7 +13,15 @@ export const routePlanToPolygon = (ret) => {
   return pl;
 };
 
-export const drawRoute = (pl, startPos, endPos, map) => {
+/**
+ * 
+ * @param {object} p1       : 路线的多条线段
+ * @param {object} startPos
+ * @param {object} endPos
+ * @param {object} map 
+ * @returns 
+ */
+export const drawRoute = ({ pl, startPos, endPos }, map) => {
   //标记起终点marker
   var marker = new window.TMap.MultiMarker({
     id: `marker-layer-${JSON.stringify(startPos)}-${JSON.stringify(endPos)}`,

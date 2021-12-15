@@ -12,7 +12,7 @@ module.exports = {
         name: 'Dashboard',
         workplace: {name: '工作台'},
         analysis: {name: '分析頁'},
-        map: {name: '地图'}
+        newPlan: {name: '新旅程'}
       },
       form: {
         name: '表單頁',
