@@ -27,6 +27,51 @@ const options = {
       redirect: '/login',
       children: [
         {
+          path: 'order',
+          name: '订单管理',
+          meta: {
+            icon: 'table'
+          },
+          component: PageView,
+          children: [
+            {
+              path: 'manage',
+              name: '订单管理',
+              component: () => import('@/pages/order/OrderManage'),
+            },
+            {
+              path: 'detail',
+              name: '详细信息',
+              component: () => import('@/pages/order/OrderDetail'),
+            },
+            {
+              path: 'pay',
+              name: '支付',
+              component: () => import('@/pages/order/pay'),
+            },
+          ]
+        },
+        {
+          path: 'enterprise',
+          name: '商家管理',
+          meta: {
+            icon: 'table'
+          },
+          component: PageView,
+          children: [
+            {
+              path: 'recommend',
+              name: '推荐商家',
+              component: () => import('@/pages/enterprise/StoreRecommend')
+            },
+            {
+              path: 'detail',
+              name: '详细信息',
+              component: () => import('@/pages/enterprise/StoreDetail')
+            }
+          ]
+        },
+        {
           path: 'dashboard',
           name: 'Dashboard',
           meta: {
@@ -37,11 +82,6 @@ const options = {
             {
               path: 'workplace',
               name: '工作台',
-              meta: {
-                page: {
-                  closable: false
-                }
-              },
               component: () => import('@/pages/dashboard/workplace'),
             },
             {
