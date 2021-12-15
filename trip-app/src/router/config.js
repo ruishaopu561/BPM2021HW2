@@ -88,6 +88,11 @@ const options = {
               path: 'analysis',
               name: '分析页',
               component: () => import('@/pages/dashboard/analysis'),
+            },
+            {
+              path: 'newPlan',
+              name: '计划新旅程',
+              component: () => import('@/pages/dashboard/newPlan')
             }
           ]
         },

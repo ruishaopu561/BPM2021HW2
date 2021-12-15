@@ -11,7 +11,8 @@ module.exports = {
       dashboard: {
         name: 'Dashboard',
         workplace: {name: '工作台'},
-        analysis: {name: '分析頁'}
+        analysis: {name: '分析頁'},
+        newPlan: {name: '新旅程'}
       },
       form: {
         name: '表單頁',
