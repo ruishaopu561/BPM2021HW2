@@ -30,9 +30,13 @@ const routerMap = {
     name: '分析页',
     component: () => import('@/pages/dashboard/analysis')
   },
-  map: {
-    name: '计划新旅程',
+  newPlan: {
+    name: '制定新旅程',
     component: () => import('@/pages/dashboard/newPlan')
+  },
+  queuePlan: {
+    name: '出行计划',
+    component: () => import('@/pages/dashboard/queuePlan')
   },
   form: {
     name: '表单页',

@@ -15,7 +15,7 @@
         @nextStep="nextStep"
         @prevStep="prevStep"
       ></Enterprise>
-      <step3 v-if="current === 2" @prevStep="prevStep" @finish="finish"></step3>
+      <PlanComplete v-if="current === 2" @prevStep="prevStep" @finish="finish"></PlanComplete>
     </div>
   </a-card>
 </template>
@@ -23,12 +23,12 @@
 <script>
 import Map from "./Map";
 import Enterprise from "./Enterprise";
-import Step3 from "./Step3";
+import PlanComplete from "./PlanComplete";
 
 export default {
   name: "StepForm",
   i18n: require("./i18n"),
-  components: { Map, Enterprise, Step3 },
+  components: { Map, Enterprise, PlanComplete },
   data() {
     return {
       current: 0,

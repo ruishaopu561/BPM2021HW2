@@ -91,8 +91,13 @@ const options = {
             },
             {
               path: 'newPlan',
-              name: '计划新旅程',
+              name: '制定新旅程',
               component: () => import('@/pages/dashboard/newPlan')
+            },
+            {
+              path: 'queuePlan',
+              name: '出行计划',
+              component: () => import('@/pages/dashboard/queuePlan')
             }
           ]
         },

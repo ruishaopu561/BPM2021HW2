@@ -86,12 +86,11 @@ export default {
     ...mapState("account", { currUser: "user" }),
     ...mapState("setting", ["lang"]),
     ...mapState({
-      KEY: (state) => state.user.MAP_API_KEY,
       defaultStartPos: (state) => state.user.defaultStartPos,
     }),
   },
   methods: {
-    ...mapMutations(["setMap", "setRoutePoint"]),
+    ...mapMutations(["setMap", "setRoutePoint","setSource","setDestination"]),
     ...mapActions(["getRoutePlanAction"]),
     async onSearch() {
       if (this.activeGraph) {
@@ -112,6 +111,8 @@ export default {
         this.map
       );
       this.activeGraph = { marker, polylineLayer };
+      this.setSource(this.source.name)
+      this.setDestination(this.destination.name)
       this.setRoutePoint({ pl, startPos: source, endPos: destination });
     },
     nextStep() {
@@ -163,7 +164,6 @@ export default {
   },
   watch: {
     inputFocus(value) {
-      console.log(value);
     },
   },
 };

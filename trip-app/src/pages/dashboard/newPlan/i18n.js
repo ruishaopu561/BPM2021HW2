@@ -29,7 +29,9 @@ module.exports = {
       doAgain: '再转一笔',
       bill: '查看账单',
       selectRoute: '选择目的地',
-      selectEnterprise: '选择商家服务'
+      selectEnterprise: '选择商家服务',
+      planComplete: '行程制定成功',
+      queuePlan: '查看出行计划'
     },
     HK: {
       project: '項目數',

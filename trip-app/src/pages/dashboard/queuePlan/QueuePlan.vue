@@ -33,8 +33,8 @@
 </template>
 
 <script>
-import DetailList from "../../components/tool/DetailList";
-import { mapMutations } from "vuex";
+import { mapState } from 'vuex';
+import DetailList from "../../../components/tool/DetailList";
 
 const DetailListItem = DetailList.Item;
 
@@ -54,42 +54,16 @@ const imgPaths = [
   "/static/img/abstract04.jpg",
 ];
 
-for (let i = 1; i <= 6; i++) {
-  storeList.push({
-    key: i,
-    username: users[i - 1],
-    starttime:
-      "2021-" +
-      (Math.floor(Math.random() * 11) + 1) +
-      "-" +
-      (Math.floor(Math.random() * 27) + 1),
-    phone: 18012345678,
-    address: "这里是地址*********",
-    status: "有空房",
-    img: imgPaths[i % 4],
-  });
-}
-
-console.log(storeList);
-
 export default {
-  name: "StoreRecommend",
-  components: { DetailListItem, DetailList },
+  name: "QueuePlan",
   data() {
-    return {
-      dataSource: storeList,
-    };
+      return {
+      }
   },
-  methods: {
-    ...mapMutations("order", ["setDetail"]),
-    handleRecordDetail(key) {
-      const detail = this.dataSource.filter((item) => item.key === key)[0];
-      this.setDetail(detail);
-      this.$router.push({ path: "/enterprise/detail" });
-    },
-  },
+  computed: {
+      ...mapState({
+          queuePlan: (state) => state.user.queuePlan
+      })
+  }
 };
 </script>
-
-<style scoped>
-</style>
