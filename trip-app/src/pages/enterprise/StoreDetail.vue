@@ -93,7 +93,7 @@ const columns = [
     sorter: true
   },
   {
-    title: '价格',
+    title: '价格(￥)',
     dataIndex: 'price',
   },
   {
@@ -114,7 +114,7 @@ for (let i = 1; i <= 6; i++) {
     name: types[Math.floor(Math.random() * 10) % 4],
     time: '2021-' + (Math.floor(Math.random() * 11) + 1)
                + '-' + (Math.floor(Math.random() * 27) + 1),
-    price: '￥' + (Math.floor(Math.random() * 200) + 300),
+    price: Math.floor(Math.random() * 200) + 300,
     description: '禁烟 有窗',
   })
 }
@@ -129,13 +129,16 @@ export default {
       selectedRows: [],
       visible: false,
       confirmLoading: false,
-      form: {}
+      form: {},
+      key: null
     }
   },
   methods: {
     ...mapMutations('order', ['setForm']),
     handleOk() {
       this.visible = false
+      let data = this.dataSource.filter(item => item.key === this.key)[0]
+      this.form.value = data.price * this.form.number
       console.log(this.form)
       this.setForm(this.form)
       this.form = {}
@@ -145,6 +148,7 @@ export default {
     },
     handleOrder(key) {
       console.log('预约', key)
+      this.key = key
       this.visible = true
     },
     remove () {

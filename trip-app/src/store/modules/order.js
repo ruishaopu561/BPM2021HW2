@@ -3,7 +3,9 @@ export default {
     state: {
       hostory: [],
       detail: null,
-      form: null
+      form: null,
+      moneyPay: 0,
+      payedId: -1
     },
     getters: {
       history: state => {
@@ -20,6 +22,16 @@ export default {
         if (state.form) {
           return state.form
         }
+      },
+      moneyPay: state => {
+        if (state.moneyPay) {
+          return state.moneyPay
+        }
+      },
+      payedId: state => {
+        if (state.payedId) {
+          return state.payedId
+        }
       }
     },
     mutations: {
@@ -31,6 +43,12 @@ export default {
       },
       setForm (state, form) {
         state.form = form
+      },
+      setMoneyPay (state, money) {
+        state.moneyPay = money
+      },
+      setPayedId (state, payedId) {
+        state.payedId = payedId
       }
     }
   }

@@ -12,7 +12,7 @@
         :wrapperCol="{span: 17}"
         class="stepFormText"
       >
-        ant-design@alipay.com
+        {{ form.payaccount }}
       </a-form-item>
       <a-form-item
         :label="$t('collection')"
@@ -20,7 +20,7 @@
         :wrapperCol="{span: 17}"
         class="stepFormText"
       >
-        test@example.com
+        {{ form.transaccount }}
       </a-form-item>
       <a-form-item
         :label="$t('collectionName')"
@@ -28,7 +28,7 @@
         :wrapperCol="{span: 17}"
         class="stepFormText"
       >
-        Alex
+        {{ form.storename }}
       </a-form-item>
       <a-form-item
         :label="$t('transferAmount')"
@@ -36,7 +36,7 @@
         :wrapperCol="{span: 17}"
         class="stepFormText"
       >
-        ￥ 5,000.00
+        ￥ {{ form.value }}
       </a-form-item>
       <a-form-item :wrapperCol="{span: 17, offset: 7}">
         <a-button :loading="loading" type="primary" @click="nextStep">{{$t('submit')}}</a-button>
@@ -47,24 +47,41 @@
 </template>
 
 <script>
+import {mapState, mapMutations} from 'vuex'
+
 export default {
   name: 'Step2',
   i18n: require('./i18n'),
   data () {
     return {
-      loading: false
+      loading: false,
+      form: {}
     }
   },
+  computed: {
+    ...mapState('order', ['moneyPay']),
+  },
+  mounted() {
+    this.init()
+  },
   methods: {
+    ...mapMutations('order', ['setPayedId']),
     nextStep () {
       let _this = this
       _this.loading = true
       setTimeout(function () {
         _this.$emit('nextStep')
       }, 1500)
+      this.setPayedId(this.form.key)
     },
     prevStep () {
       this.$emit('prevStep')
+    },
+    init () {
+      this.form = this.moneyPay
+      this.form.payaccount = 'zhangsan@alipay.com'
+      this.form.transaccount = 'yilongjiudian@alipay.com'
+      console.log(this.form)
     }
   }
 }

@@ -13,6 +13,9 @@
           {{text}}
         </div>
         <div slot="action" slot-scope="{text}">
+          <a @click="payRecord(text.key)" style="margin-right:8px">
+            <a-icon type="transaction" />支付
+          </a>
           <a @click="editRecord(text.key)" style="margin-right:8px">
             <a-icon type="edit" />修改
           </a>
@@ -120,7 +123,7 @@
         </a-space>
         <standard-table
           :columns="columns"
-          :dataSource="dataSource"
+          :dataSource="historyDataSource"
           :selectedRows.sync="selectedRows"
           @clear="onClear"
           @change="onChange"
@@ -130,10 +133,10 @@
             {{text}}
           </div>
           <div slot="action" slot-scope="{text}">
-            <a @click="deleteRecord(text.key)" style="margin-right:8px">
+            <a @click="deleteHistoryRecord(text.key)" style="margin-right:8px">
               <a-icon type="delete"/>删除
             </a>
-            <a @click="handleRecordDetail(text.key)">
+            <a @click="handleHistoryRecordDetail(text.key)">
               <a-icon type="link"/>详情
             </a>
           </div>
@@ -173,6 +176,10 @@ const columns = [
     dataIndex: 'number',
   },
   {
+    title: '总价(￥)',
+    dataIndex: 'value',
+  },
+  {
     title: '状态',
     dataIndex: 'status',
     needTotal: true,
@@ -196,9 +203,22 @@ const stores = ['上海艺龙酒店',
                '上海快捷酒店']
 const types = ['单人标间', '双人标间', '家庭套房', 'VIP套房']
 let dataList = []
+let historyDataList = []
 
 for (let i = 1; i <= 8; i++) {
   dataList.push({
+    key: i+10,
+    no: 'NO ' + (i+10),
+    storename: stores[Math.floor(Math.random() * 10) % 4],
+    ordertime: '2021-' + (Math.floor(Math.random() * 11) + 1)
+               + '-' + (Math.floor(Math.random() * 27) + 1),
+    status: '已预约',
+    type: types[Math.floor(Math.random() * 10) % 4],
+    number: Math.floor(Math.random() * 3) + 1,
+    value: Math.floor(Math.random() * 300) + 500,
+    description: '这是一段描述',
+  })
+  historyDataList.push({
     key: i,
     no: 'NO ' + i,
     storename: stores[Math.floor(Math.random() * 10) % 4],
@@ -207,6 +227,7 @@ for (let i = 1; i <= 8; i++) {
     status: '已结束',
     type: types[Math.floor(Math.random() * 10) % 4],
     number: Math.floor(Math.random() * 3) + 1,
+    value: Math.floor(Math.random() * 300) + 500,
     description: '这是一段描述',
   })
 }
@@ -219,6 +240,7 @@ export default {
       advanced: true,
       columns: columns,
       dataSource: dataList,
+      historyDataSource: historyDataList,
       selectedRows: [],
       visible: false,
       confirmLoading: false,
@@ -228,6 +250,7 @@ export default {
         ordertime: '',
         type: 0,
         number: 0,
+        value: 0,
         desc: ''
       },
       editForm: {},
@@ -235,16 +258,17 @@ export default {
     }
   },
   computed: {
-    ...mapState('order', ['history', 'form']),
+    ...mapState('order', ['history', 'form', 'payedId']),
     desc() {
       return this.$t('展示和查询历史订单')
     }
   },
   mounted() {
     this.init(20, this.form)
+
   },
   methods: {
-    ...mapMutations('order', ['setDetail', 'setForm']),
+    ...mapMutations('order', ['setDetail', 'setForm', 'setMoneyPay']),
     init(key) {
       console.log(this.form)
       if (this.form) {
@@ -256,6 +280,7 @@ export default {
           status: '处理中',
           type: types[this.form.type - 1],
           number: this.form.number,
+          value: this.form.value,
           description: '这是一段描述',
         }
         this.dataSource.push(data)
@@ -266,6 +291,7 @@ export default {
     handleOk() {
       this.visible = false
       console.log(this.editForm)
+      let oldOrder = this.dataSource.filter(item => item.key === this.key)[0]
       let data = {
         key: this.key,
         no: 'NO ' + this.key,
@@ -274,6 +300,7 @@ export default {
         status: '修改处理中',
         type: types[this.editForm.type - 1],
         number: this.editForm.number,
+        value: oldOrder.value,
         description: '这是一段描述',
       }
       this.dataSource = this.dataSource.filter(item => item.key !== this.key)
@@ -283,9 +310,26 @@ export default {
     handleCancel() {
       this.visible = false
     },
+    payRecord(key) {
+      let data = this.dataSource.filter(item => item.key === key)[0]
+      console.log('data', data)
+      this.setMoneyPay(data)
+      this.$router.push({path:'/order/pay'})
+      this.afterPay(key)
+    },
+    afterPay(key) {
+      if (key !== -1) {
+        let data = this.dataSource.filter(item => item.key === key)[0]
+        this.dataSource = this.dataSource.filter(item => item.key !== key)
+        if (data) {
+          data.status = '已结束'
+          this.historyDataSource.push(data)
+        }
+      }
+    },
     editRecord(key) {
       this.key = key
-      let data = this.dataSource.filter(item => item.key !== key)[0]
+      let data = this.dataSource.filter(item => item.key === key)[0]
       this.editForm = {
         storename: data.storename,
         number: data.number
@@ -295,10 +339,20 @@ export default {
     deleteRecord(key) {
       dataList = dataList.filter(item => item.key !== key)
       this.dataSource = dataList
-      this.selectedRows = this.selectedRows.filter(item => item.key !== key)
+      this.selectedRows = []
+    },
+    deleteHistoryRecord(key) {
+      historyDataList = historyDataList.filter(item => item.key !== key)
+      this.historyDataSource = historyDataList
+      this.selectedRows = []
     },
     handleRecordDetail(key) {
       const detail = this.dataSource.filter(item => item.key === key)[0]
+      this.setDetail(detail)
+      this.$router.push({path:'/order/detail'})
+    },
+    handleHistoryRecordDetail(key) {
+      const detail = this.historyDataSource.filter(item => item.key === key)[0]
       this.setDetail(detail)
       this.$router.push({path:'/order/detail'})
     },
