@@ -78,7 +78,7 @@
 import DetailList from '@/components/tool/DetailList'
 import StandardTable from '@/components/table/StandardTable'
 import OrderForm from '../order/create/OrderForm'
-import {order} from '@/services'
+// import {order} from '@/services'
 import {mapMutations} from 'vuex'
 
 const DetailListItem = DetailList.Item
@@ -142,13 +142,13 @@ export default {
       this.form.value = data.price * this.form.number
       console.log(this.form)
       this.setForm(this.form)
-      // 发送到 rmp 平台
-      const f = this.form
-      // console.log('f.type', (f.type-'0'))
-      f.type = types[(f.type-'0')]
-      order.createOrder(f).then(res => {
-        console.log(res)
-      })
+      // // 发送到 rmp 平台
+      // const f = this.form
+      // // console.log('f.type', (f.type-'0'))
+      // f.type = types[(f.type-'0')]
+      // order.createOrder(f).then(res => {
+      //   console.log(res)
+      // })
       this.form = {}
     },
     handleCancel() {

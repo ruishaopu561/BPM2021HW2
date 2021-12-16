@@ -36,7 +36,10 @@ async function request(url, method, params, config) {
       return axios.get(url, {params, ...config})
     case METHOD.POST:
       return axios.post(url, params, config)
-    default:
+      case METHOD.PUT:
+        console.log(url, params, config)
+        return axios.put(url, params, config)
+      default:
       return axios.get(url, {params, ...config})
   }
 }

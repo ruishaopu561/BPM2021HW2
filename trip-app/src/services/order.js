@@ -17,9 +17,24 @@ export async function createOrder(order) {
   return request(ORDER, METHOD.POST, data, 'Content-Type=application/json')
 }
 
+export async function updateOrder(order) {
+  let data = {
+    ID: order.ID,
+    enterpriseID: order.enterpriseID,
+    time: order.time,
+    money: order.money,
+    number: order.number,
+    comment: order.comment,
+    status: order.status,
+    type: order.type
+  }
+  console.log(data)
+  return request(ORDER + '/3', METHOD.PUT, data, {'content-type': 'application/json'})
+}
+
 export async function fetchOrder(id) {
     console.log(id)
     return request(ORDER + '/' + id, METHOD.GET)
 }
 
-export default {createOrder, fetchOrder}
+export default {createOrder, updateOrder, fetchOrder}

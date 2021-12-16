@@ -149,6 +149,7 @@
 <script>
 import StandardTable from '@/components/table/StandardTable'
 import OrderForm from '../order/create/OrderForm'
+// import {order} from '@/services'
 import {mapState, mapMutations} from 'vuex'
 
 const columns = [
@@ -305,6 +306,21 @@ export default {
       }
       this.dataSource = this.dataSource.filter(item => item.key !== this.key)
       this.dataSource.push(data)
+
+      // // 发送到 rmp 平台
+      // const f = {
+      //   ID: this.editForm.name,
+      //   enterpriseID: this.editForm.storename,
+      //   time: this.editForm.ordertime,
+      //   number: this.editForm.number,
+      //   status: 2,
+      //   money: oldOrder.value,
+      //   comment: '这是一段描述',
+      //   type: types[this.editForm.type - 1],
+      // }
+      // order.updateOrder(f).then(res => {
+      //   console.log(res)
+      // })
       this.editForm = {}
     },
     handleCancel() {
