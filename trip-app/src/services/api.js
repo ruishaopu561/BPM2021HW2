@@ -7,4 +7,5 @@ module.exports = {
   ROUTES: `${BASE_URL}/routes`,
   GOODS: `${BASE_URL}/goods`,
   GOODS_COLUMNS: `${BASE_URL}/columns`,
+  ORDER: `http://202.120.40.86:14642/rmp-resource-service/project/61b7284278ae950017f6ec75/resource/order`
 }
