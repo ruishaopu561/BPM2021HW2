@@ -1,31 +1,25 @@
 <template>
   <div>
     <a-row :gutter="24">
-      <a-col v-for="item in dataSource" v-bind:key="item.key" :span="8">
+      <a-col v-for="(item, index) in queuePlan" v-bind:key="index" :span="8">
         <a-card hoverable style="width: 100%">
-          <img slot="cover" :src="item.img" />
-          <detail-list :title="item.username" :col="1">
-            <detail-list-item term="酒店名称">{{
-              item.username
-            }}</detail-list-item>
-            <detail-list-item term="联系电话">{{
-              item.phone
-            }}</detail-list-item>
-            <detail-list-item term="地址">{{ item.address }}</detail-list-item>
-            <detail-list-item term="房间状态">{{
-              item.status
+          <img slot="cover" :src="imgPaths[0]" />
+          <detail-list :title="item.source + '->' + item.destination" :col="1">
+            <detail-list-item term="起始点">{{ item.source }}</detail-list-item>
+            <detail-list-item term="目的地">{{
+              item.destination
             }}</detail-list-item>
             <detail-list-item>
-              <a @click="handleRecordDetail(item.key)">
-                <a-icon type="link" />详情
-              </a>
+              <a-button @click="handleRecordDetail({ item, index })"
+                >详情</a-button
+              >
+              <a-button
+                type="primary"
+                @click="handleStartTripBtnClick({ item, index })"
+                >开始行程</a-button
+              >
             </detail-list-item>
           </detail-list>
-          <!-- <div slot="action" class="ant-card-actions">
-            <a @click="handleRecordDetail(item.key)">
-              <a-icon type="link"/>详情
-            </a>
-          </div> -->
         </a-card>
       </a-col>
     </a-row>
@@ -33,20 +27,11 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
+import { mapMutations, mapState } from "vuex";
 import DetailList from "../../../components/tool/DetailList";
 
 const DetailListItem = DetailList.Item;
 
-const storeList = [];
-const users = [
-  "上海艺龙酒店",
-  "上海陆家嘴丽呈酒店",
-  "秋果酒店",
-  "上海虹桥国家会展中心同派酒店",
-  "上海铂尔曼酒店",
-  "上海快捷酒店",
-];
 const imgPaths = [
   "/static/img/abstract01.jpg",
   "/static/img/abstract02.jpg",
@@ -56,14 +41,35 @@ const imgPaths = [
 
 export default {
   name: "QueuePlan",
+  components: { DetailListItem, DetailList },
   data() {
-      return {
-      }
+    return {
+      imgPaths,
+    };
   },
   computed: {
-      ...mapState({
-          queuePlan: (state) => state.user.queuePlan
-      })
-  }
+    ...mapState({
+      queuePlan: (state) => state.user.queuePlan,
+      isPlanStart: (state) => state.user.isPlanStart,
+    }),
+  },
+  methods: {
+    ...mapMutations(["setPlanDetail", "setActivePlan", "setPlanStart"]),
+    handleRecordDetail({ item, index }) {
+      this.setPlanDetail(index);
+    //   console.log(item);
+      this.$router.push({ path: "/dashboard/planDetail" });
+    },
+    handleStartTripBtnClick({ item, index }) {
+      if (this.isPlanStart) {
+          // TODO: 使用message box表示已有行程在进行
+          return
+      }
+      this.setPlanStart();
+      this.setActivePlan(index);
+    //   console.log(item);
+      this.$router.push({ path: "/dashboard/activePlan" });
+    },
+  },
 };
 </script>

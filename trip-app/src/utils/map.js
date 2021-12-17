@@ -1,6 +1,6 @@
-export const routePlanToPolygon = (ret) => {
+export const routePlanToPolygon = (polyline) => {
   let pl = [];
-  var coords = ret.result.routes[0].polyline;
+  var coords = polyline;
   //坐标解压（返回的点串坐标，通过前向差分进行压缩）
   var kr = 1000000;
   for (let i = 2; i < coords.length; i++) {
@@ -14,17 +14,17 @@ export const routePlanToPolygon = (ret) => {
 };
 
 /**
- * 
+ *
  * @param {object} p1       : 路线的多条线段
  * @param {object} startPos
  * @param {object} endPos
- * @param {object} map 
- * @returns 
+ * @param {object} map
+ * @returns
  */
-export const drawRoute = ({ pl, startPos, endPos }, map) => {
+export const drawRoute = ({ pl, startPos, endPos, index }, map) => {
   //标记起终点marker
   var marker = new window.TMap.MultiMarker({
-    id: `marker-layer-${JSON.stringify(startPos)}-${JSON.stringify(endPos)}`,
+    id: `marker-layer-${JSON.stringify(startPos)}-${JSON.stringify(endPos)}-${index}`,
     map: map,
     styles: {
       start: new window.TMap.MarkerStyle({
@@ -56,7 +56,7 @@ export const drawRoute = ({ pl, startPos, endPos }, map) => {
 
   //创建 MultiPolyline显示折线
   var polylineLayer = new window.TMap.MultiPolyline({
-    id: `polyline-layer-${JSON.stringify(startPos)}-${JSON.stringify(endPos)}`, //图层唯一标识
+    id: `polyline-layer-${JSON.stringify(startPos)}-${JSON.stringify(endPos)}-${index}`, //图层唯一标识
     map: map, //绘制到目标地图
     //折线样式定义
     styles: {
@@ -77,5 +77,5 @@ export const drawRoute = ({ pl, startPos, endPos }, map) => {
       },
     ],
   });
-  return { marker, polylineLayer }
+  return { marker, polylineLayer };
 };

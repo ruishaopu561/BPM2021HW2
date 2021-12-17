@@ -218,7 +218,7 @@ export default {
             }); // 点击标注显示信息窗体
           });
         });
-      console.log(this.markerList);
+      // console.log(this.markerList);
     });
   },
   watch: {},

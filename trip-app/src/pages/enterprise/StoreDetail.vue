@@ -155,7 +155,7 @@ export default {
     handleOk() {
       let data = this.dataSource.filter((item) => item.key === this.key)[0];
       this.form.value = data.price * this.form.number;
-      console.log(this.form);
+      // console.log(this.form);
       this.setForm(this.form);
       this.addReservation({
         type: data.name,

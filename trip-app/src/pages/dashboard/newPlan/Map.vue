@@ -90,8 +90,39 @@ export default {
     }),
   },
   methods: {
-    ...mapMutations(["setMap", "setRoutePoint","setSource","setDestination"]),
-    ...mapActions(["getRoutePlanAction"]),
+    ...mapMutations([
+      "setMap",
+      "setRoutePoint",
+      "setSource",
+      "setDestination",
+      "setRealRoutePoint",
+      "setDurationAndFeeAndDistance",
+      "setRealRouteDurationAndFeeAndDistance",
+    ]),
+    ...mapActions(["getRoutePlanAction", "getRealRoutePlanAction"]),
+    // async onSearch() {
+    //   if (this.activeGraph) {
+    //     // .setGeometries([])
+    //     this.activeGraph.marker.setMap(null);
+    //     this.activeGraph.polylineLayer.setMap(null);
+    //     this.activeGraph = null;
+    //   }
+    //   let source = this.source.latLng;
+    //   let destination = this.destination.latLng;
+    //   let route = { startPos: source, endPos: destination };
+    //   let ret = await this.getRoutePlanAction(route);
+
+    //   let pl = routePlanToPolygon(ret.result.routes[0].polyline);
+
+    //   let { marker, polylineLayer } = drawRoute(
+    //     { pl, startPos: route.startPos, endPos: route.endPos, index: 0 },
+    //     this.map
+    //   );
+    //   this.activeGraph = { marker, polylineLayer };
+    //   this.setSource(this.source.name);
+    //   this.setDestination(this.destination.name);
+    //   this.setRoutePoint({ pl, startPos: source, endPos: destination });
+    // },
     async onSearch() {
       if (this.activeGraph) {
         // .setGeometries([])
@@ -102,18 +133,45 @@ export default {
       let source = this.source.latLng;
       let destination = this.destination.latLng;
       let route = { startPos: source, endPos: destination };
-      let ret = await this.getRoutePlanAction(route);
+      let ret = await this.getRealRoutePlanAction(route);
 
-      let pl = routePlanToPolygon(ret);
+      console.log(`Number of Route: ${ret.result.routes.length}`)
 
+      let durations = ret.result.routes.map((r) => r.duration);
+      let minDurationIndex = durations.indexOf(Math.min(...durations));
+      let maxDurationIndex = durations.indexOf(Math.max(...durations));
+
+      let pl = routePlanToPolygon(ret.result.routes[maxDurationIndex].polyline);
       let { marker, polylineLayer } = drawRoute(
-        { pl, startPos: route.startPos, endPos: route.endPos },
+        { pl, startPos: route.startPos, endPos: route.endPos, index: 0 },
         this.map
       );
       this.activeGraph = { marker, polylineLayer };
-      this.setSource(this.source.name)
-      this.setDestination(this.destination.name)
+      this.setSource(this.source.name);
+      this.setDestination(this.destination.name);
       this.setRoutePoint({ pl, startPos: source, endPos: destination });
+      this.setDurationAndFeeAndDistance({
+        duration: ret.result.routes[maxDurationIndex].duration,
+        fee: ret.result.routes[maxDurationIndex].taxi_fare,
+        distance: ret.result.routes[maxDurationIndex].distance,
+      });
+
+      console.log(minDurationIndex, maxDurationIndex)
+
+      // TODO: minDuration = -infinite ?
+      if (maxDurationIndex !== minDurationIndex) {
+        let pl = routePlanToPolygon(
+          ret.result.routes[minDurationIndex].polyline
+        );
+        // this.activeGraph = { marker, polylineLayer };
+        this.setRealRoutePoint({ pl, startPos: source, endPos: destination });
+        // TODO:
+        this.setRealRouteDurationAndFeeAndDistance({
+          duration: ret.result.routes[minDurationIndex].duration,
+          fee: ret.result.routes[minDurationIndex].taxi_fare,
+          distance: ret.result.routes[minDurationIndex].distance,
+        });
+      }
     },
     nextStep() {
       this.$emit("nextStep");
@@ -163,8 +221,7 @@ export default {
     this.setMap(this.map);
   },
   watch: {
-    inputFocus(value) {
-    },
+    inputFocus(value) {},
   },
 };
 </script>
