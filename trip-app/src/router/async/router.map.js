@@ -30,6 +30,26 @@ const routerMap = {
     name: '分析页',
     component: () => import('@/pages/dashboard/analysis')
   },
+  newPlan: {
+    name: '制定新旅程',
+    component: () => import('@/pages/dashboard/newPlan')
+  },
+  queuePlan: {
+    name: '出行计划',
+    component: () => import('@/pages/dashboard/queuePlan')
+  },
+  activePlan: {
+    name: '出行中计划',
+    component: () => import('@/pages/dashboard/queuePlan/ActivePlan')
+  },
+  historyPlan: {
+    name: '历史出行计划',
+    component: () => import('@/pages/dashboard/queuePlan/HistoryPlan')
+  },
+  planDetail: {
+    name: '计划详情',
+    component: () => import('@/pages/dashboard/queuePlan/PlanDetail')
+  },
   form: {
     name: '表单页',
     icon: 'form',

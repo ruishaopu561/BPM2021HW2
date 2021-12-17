@@ -20,14 +20,14 @@
         :labelCol="{span: 7}"
         :wrapperCol="{span: 10}"
       >
-        <a-date-picker @change="handleDatechange" style="width:100%" placeholder="请输入日期" />
+        <a-date-picker v-model="form.ordertime" @change="handleDatechange" style="width:100%" placeholder="请输入日期" />
       </a-form-item>
       <a-form-item
         label="房间类型"
         :labelCol="{span: 7}"
         :wrapperCol="{span: 10}"
       >
-        <a-select @change="handleTypeChange" placeholder="请选择">
+        <a-select default-value="1" @change="handleTypeChange" placeholder="请选择">
           <a-select-option value="1">单人标间</a-select-option>
           <a-select-option value="2">双人标间</a-select-option>
           <a-select-option value="3">家庭套房</a-select-option>
@@ -66,7 +66,7 @@ export default {
     },
     handleDatechange(_, dateString) {
       this.form.ordertime = dateString
-      console.log(this.form.ordertime)
+      // console.log(this.form.ordertime)
     }
   }
 }

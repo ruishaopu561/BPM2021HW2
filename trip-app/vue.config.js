@@ -45,6 +45,13 @@ module.exports = {
         pathRewrite: {
           '^/api': ''
         }
+      },
+      '/map': {
+        target: 'https://apis.map.qq.com/ws',
+        changeOrigin: true,
+        pathRewrite: {
+          '^/map': ''
+        }
       }
     }
   },
