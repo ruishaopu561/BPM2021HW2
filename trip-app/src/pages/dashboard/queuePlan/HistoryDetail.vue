@@ -178,7 +178,7 @@ export default {
       }
 
       let lookFromList = this.historyDetail.points.pl.map((item, index) => ({
-        position: new window.TMap.LatLng(item.lat, item.lng, 800),
+        position: new window.TMap.LatLng(item.lat, item.lng, 1000),
         rotation: [0, 0, 0], // 地图在水平面上的旋转角度
         percentage: (index + 1) / this.historyDetail.points.pl.length, // 动画过程中该关键帧的百分比
       }));
@@ -186,7 +186,7 @@ export default {
         position: new window.TMap.LatLng(
           this.historyDetail.points.startPos.lat,
           this.historyDetail.points.startPos.lng,
-          800
+          1000
         ),
         rotation: [0, 0, 0], // 地图在水平面上的旋转角度
         percentage: 0,
@@ -231,7 +231,8 @@ export default {
       // map.startAnimation 文档地址：https://lbs.qq.com/webApi/javascriptGL/glDoc/docIndexMap
       // 开始动画，通过keyFrames定义关键帧
       this.map.startAnimation(keyFrames, {
-        duration: this.historyDetail.points.pl.length * 1000, // 动画周期时长，单位为ms
+        // duration: this.historyDetail.points.pl.length * 1000, // 动画周期时长，单位为ms
+        duration: 90 * 1000,
         loop: 1, // 动画周期循环次数，若为Infinity则无限循环，默认为1
       });
     },

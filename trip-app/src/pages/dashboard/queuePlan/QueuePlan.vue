@@ -3,7 +3,7 @@
     <a-row :gutter="24">
       <a-col v-for="(item, index) in queuePlan" v-bind:key="index" :span="8">
         <a-card hoverable style="width: 100%">
-          <img slot="cover" :src="imgPaths[item.id % 3]" />
+          <img slot="cover" :src="imgPaths[item.id % 6]" />
           <detail-list :title="item.source + '->' + item.destination" :col="1">
             <detail-list-item term="起始点">{{ item.source }}</detail-list-item>
             <detail-list-item term="目的地">{{
@@ -36,6 +36,9 @@ const imgPaths = [
   "/static/img/trip1.jpg",
   "/static/img/trip2.jpg",
   "/static/img/trip3.jpg",
+  "/static/img/trip4.jpg",
+  "/static/img/trip5.jpg",
+  "/static/img/trip6.jpg",
 ];
 
 export default {
@@ -62,7 +65,7 @@ export default {
     handleStartTripBtnClick({ item, index }) {
       if (this.isPlanStart) {
         // TODO: 使用message box表示已有行程在进行
-        this.$message.info('请先完成进行中的行程');
+        this.$message.info("请先完成进行中的行程");
         return;
       }
       this.setPlanStart();
