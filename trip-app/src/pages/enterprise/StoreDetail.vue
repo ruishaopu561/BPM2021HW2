@@ -166,10 +166,11 @@ export default {
         number: this.form.number,
         ordertime: this.form.ordertime,
         value: data.price * this.form.number,
-        storename: this.detail.username
+        storename: this.detail.username,
+        status: "等待商家确认",
       });
       this.form = {};
-      this.form.storename = this.detail.username
+      this.form.storename = this.detail.username;
       this.visible = false;
     },
     handleCancel() {
@@ -205,9 +206,9 @@ export default {
       this.remove();
     },
   },
-  mounted () {
-    this.form.storename = this.detail.username
-  }
+  mounted() {
+    this.form.storename = this.detail.username;
+  },
 };
 </script>
 

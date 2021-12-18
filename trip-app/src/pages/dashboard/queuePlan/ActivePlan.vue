@@ -4,7 +4,7 @@
       <a-col :span="20">
         <a-alert
           v-if="alertVisible"
-          message="根据实时路况，发现更快的路线"
+          message="根据实时路况，发现通行时间更短的路线"
           type="success"
           closable
           :after-close="handleClose"
@@ -41,20 +41,15 @@
     <a-row>
       <div id="container4"></div>
     </a-row>
-    <a-row>
+    <!-- <a-row>
       <a-table
         v-if="activePlan.reservationList.length !== 0"
         :columns="columns"
         :data-source="activePlan.reservationList"
-      >
-        <!-- <a slot="name" slot-scope="text">{{ text }}</a> -->
-        <div slot="operation" slot-scope="text, record, index">
+      div slot="operation" slot-scope="text, record, index">
           <a-button
             v-if="activePlan.reservationList.length !== 0"
-            @click="() => modifyBtnClick(record, index)"
-          >
-            修改预定信息
-          </a-button>
+            @click="() => modifyBtnClick(record, index)a-button>
         </div>
       </a-table>
       <a-modal
@@ -68,9 +63,56 @@
       >
         <OrderForm :form="activeReservation" />
       </a-modal>
+    </a-row> -->
+    <a-row>
+      <a-card title="处理中订单">
+        <!-- @selectedRowChange="onSelectChange" -->
+        <!-- :selectedRows.sync="selectedRows" -->
+        <standard-table
+          :columns="columns"
+          :dataSource="activePlan.reservationList"
+        >
+          <div slot="description" slot-scope="{ text }">
+            {{ text }}
+          </div>
+          <div slot="action" slot-scope="{ text }">
+            <a @click="payRecord(text.key)" style="margin-right: 8px">
+              <a-icon type="transaction" />支付
+            </a>
+            <a
+              @click="modifyBtnClick(text, text.key)"
+              style="margin-right: 8px"
+            >
+              <a-icon type="edit" />修改
+            </a>
+            <!-- <a @click="deleteRecord(text.key)" style="margin-right: 8px">
+              <a-icon type="delete" />删除
+            </a> -->
+            <a @click="handleRecordDetail(text.key)">
+              <a-icon type="link" />详情
+            </a>
+          </div>
+        </standard-table>
+        <a-modal
+          title="修改订单"
+          ok-text="确认"
+          cancel-text="取消"
+          :visible="visible"
+          :confirm-loading="confirmLoading"
+          @ok="handleOk"
+          @cancel="handleCancel"
+        >
+          <OrderForm :form="tempReservation" />
+        </a-modal>
+      </a-card>
     </a-row>
     <a-row>
-      <a-button type="primary" block @click="tripCompleteBtnClick">
+      <a-button
+        v-if="allPaid"
+        type="primary"
+        block
+        @click="tripCompleteBtnClick"
+      >
         旅程完成
       </a-button>
     </a-row>
@@ -78,6 +120,7 @@
 </template>
 
 <script>
+import StandardTable from "@/components/table/StandardTable";
 import { drawRoute } from "@/utils/map";
 import { mapMutations, mapState } from "vuex";
 import OrderForm from "../../order/create/OrderForm";
@@ -104,52 +147,92 @@ const columns = [
     key: "name",
   },
   {
+    title: "数量",
+    dataIndex: "number",
+  },
+  {
+    title: "总价(￥)",
+    dataIndex: "value",
+  },
+  {
+    title: "状态",
+    dataIndex: "status",
+    needTotal: true,
+  },
+  {
     title: "操作",
-    dataIndex: "operation",
-    scopedSlots: { customRender: "operation" },
+    scopedSlots: { customRender: "action" },
   },
 ];
 
 export default {
   name: "ActivePlan",
-  components: { OrderForm },
+  components: { OrderForm, StandardTable },
   data() {
     return {
       map: null,
       columns,
       visible: false,
       activeReservation: null,
-      activeReservationIndex: null,
+      activeReservationKey: null,
       confirmLoading: false,
       alertVisible: false,
       activeGraph: null,
+      tempReservation: null,
     };
   },
   computed: {
     ...mapState({
       activePlan: (state) => state.user.activePlan,
     }),
+    allPaid() {
+      for (let item of this.activePlan.reservationList) {
+        if (item.status !== "已支付") {
+          return false;
+        }
+      }
+      return true;
+    },
   },
   methods: {
-    ...mapMutations(["modifyReservation", "changeRealRoutePoints", "addHistoryPlan"]),
-    modifyBtnClick(record, index) {
+    ...mapMutations([
+      "modifyReservation",
+      "changeRealRoutePoints",
+      "addHistoryPlan",
+      "setPlanFinish",
+    ]),
+    ...mapMutations("order", ["setDetail", "setMoneyPay"]),
+    modifyBtnClick(text, key) {
       this.visible = true;
-      this.activeReservation = record;
-      this.activeReservationIndex = index;
+      this.activeReservation = text;
+      this.activeReservationKey = key;
+      this.tempReservation = JSON.parse(JSON.stringify(this.activeReservation));
+      console.log(this.activeReservation)
     },
-    handleOk() {
-      this.visible = false;
-      this.modifyReservation({
-        reservation: this.activeReservation,
-        reservationIndex: this.activeReservationIndex,
-      });
+    async handleOk() {
+      this.confirmLoading = true;
+      setTimeout(() => {
+        this.confirmLoading = false;
+        this.visible = false;
+        this.activeReservation.status = "等待商家处理修改";
+      }, 1000);
+      setTimeout(() => {
+        this.activeReservation.ordertime = this.tempReservation.ordertime
+        this.activeReservation.status = "已修改";
+        this.modifyReservation({
+          reservation: this.tempReservation,
+          reservationKey: this.activeReservationKey,
+        });
+        this.$message.success('修改状态已更新');
+      }, 5000);
     },
     handleCancel() {
       this.visible = false;
     },
     tripCompleteBtnClick() {
-        this.addHistoryPlan()
-        this.$router.push({path: '/dashboard/historyPlan'})
+      this.addHistoryPlan();
+      this.setPlanFinish();
+      this.$router.push({ path: "/dashboard/historyPlan" });
     },
     handleClose() {
       this.alertVisible = false;
@@ -174,6 +257,95 @@ export default {
       );
       this.activeGraph = { marker, polylineLayer };
     },
+    payRecord(key) {
+      let data = this.activePlan.reservationList.filter(
+        (item) => item.key === key
+      )[0];
+      // console.log("data", data);
+      this.setMoneyPay(data);
+      this.$router.push({ path: "/order/pay" });
+      setTimeout(() => {
+        this.afterPay(key);
+      }, 1000);
+    },
+    afterPay(key) {
+      if (key !== -1) {
+        let reservation = this.activePlan.reservationList.filter(
+          (item) => item.key === key
+        )[0];
+        reservation.status = "已支付";
+        this.modifyReservation({
+          reservation: this.activeReservation,
+          reservationKey: this.activeReservationKey,
+        });
+        // this.dataSource = this.dataSource.filter((item) => item.key !== key);
+        // if (data) {
+        //   data.status = "已结束";
+        //   this.historyDataSource.push(data);
+        // }
+      }
+    },
+    // deleteRecord(key) {
+    //   console.log(key);
+    //   this.activePlan.reservationList = this.activePlan.reservationList.filter((item) => item.key !== key);
+    //   // this.dataSource = dataList;
+    //   // this.selectedRows = [];
+    // },
+    handleRecordDetail(key) {
+      const detail = this.activePlan.reservationList.filter(
+        (item) => item.key === key
+      )[0];
+      this.setDetail(detail);
+      this.$router.push({ path: "/order/detail" });
+    },
+    // handleHistoryRecordDetail(key) {
+    //   const detail = this.historyDataSource.filter(
+    //     (item) => item.key === key
+    //   )[0];
+    //   this.setDetail(detail);
+    //   this.$router.push({ path: "/order/detail" });
+    // },
+    // handleTypeChange(text) {
+    //   this.searchForm.type = text;
+    // },
+    // handleDatechange(_, dateString) {
+    //   this.searchForm.date = dateString;
+    // },
+    // search() {
+    //   console.log(this.searchForm.no);
+    //   console.log(this.searchForm.storename);
+    //   console.log(this.searchForm.number);
+    //   console.log(this.searchForm.type);
+    //   console.log(this.searchForm.ordertime);
+    //   console.log(this.searchForm.desc);
+    //   var key = this.searchForm.storename;
+    //   if (key != "") {
+    //     this.historyDataSource = historyDataList.filter(
+    //       (item) => item.storename === key
+    //     );
+    //   } else {
+    //     this.historyDataSource = historyDataList;
+    //   }
+    // },
+    // reset() {
+    //   this.searchForm.no = "";
+    //   this.searchForm.storename = "";
+    //   this.searchForm.number = 0;
+    //   this.searchForm.type = 0;
+    //   this.searchForm.ordertime = "";
+    //   this.searchForm.desc = "";
+    // },
+    // toggleAdvanced() {
+    //   this.advanced = !this.advanced;
+    // },
+    // remove() {
+    //   dataList = dataList.filter(
+    //     (item) =>
+    //       this.selectedRows.findIndex((row) => row.key === item.key) === -1
+    //   );
+    //   this.dataSource = dataList;
+    //   this.selectedRows = [];
+    // },
   },
   mounted() {
     let center = new window.TMap.LatLng(

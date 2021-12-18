@@ -25,7 +25,7 @@
     <a-row>
       <div id="container3"></div>
     </a-row>
-    <a-row>
+    <!-- <a-row>
       <a-table
         v-if="planDetail.reservationList.length !== 0"
         :columns="columns"
@@ -33,12 +33,35 @@
       >
         <a slot="name" slot-scope="text">{{ text }}</a>
       </a-table>
+    </a-row> -->
+    <a-row>
+      <a-card title="处理中订单">
+        <!-- @selectedRowChange="onSelectChange" -->
+        <!-- :selectedRows.sync="selectedRows" -->
+        <standard-table
+          :columns="columns"
+          :dataSource="planDetail.reservationList"
+        >
+          <div slot="description" slot-scope="{ text }">
+            {{ text }}
+          </div>
+          <div slot="action" slot-scope="{ text }">
+            <!-- <a @click="deleteRecord(text.key)" style="margin-right: 8px">
+              <a-icon type="delete" />删除
+            </a> -->
+            <a @click="handleRecordDetail(text.key)">
+              <a-icon type="link" />详情
+            </a>
+          </div>
+        </standard-table>
+      </a-card>
     </a-row>
   </div>
 </template>
 
 <script>
-import { mapState } from "vuex";
+import StandardTable from "@/components/table/StandardTable";
+import { mapMutations, mapState } from "vuex";
 import { drawRoute } from "@/utils/map";
 
 const columns = [
@@ -58,28 +81,51 @@ const columns = [
     key: "type",
   },
   {
-    title: "房型数目",
-    dataIndex: "number",
-    key: "number",
-  },
-  {
     title: "预约人",
     dataIndex: "name",
     key: "name",
+  },
+  {
+    title: "数量",
+    dataIndex: "number",
+  },
+  {
+    title: "总价(￥)",
+    dataIndex: "value",
+  },
+  {
+    title: "状态",
+    dataIndex: "status",
+    needTotal: true,
+  },
+  {
+    title: "操作",
+    scopedSlots: { customRender: "action" },
   },
 ];
 
 export default {
   name: "PlanDetail",
+  components: { StandardTable },
   data() {
     return {
-        columns
+      columns,
     };
   },
   computed: {
     ...mapState({
       planDetail: (state) => state.user.planDetail,
     }),
+  },
+  methods: {
+    ...mapMutations("order", ["setDetail"]),
+    handleRecordDetail(key) {
+      const detail = this.planDetail.reservationList.filter(
+        (item) => item.key === key
+      )[0];
+      this.setDetail(detail);
+      this.$router.push({ path: "/order/detail" });
+    },
   },
   async mounted() {
     let center = new window.TMap.LatLng(
@@ -98,6 +144,13 @@ export default {
     });
 
     let { marker } = drawRoute(this.planDetail.points, this.map);
+
+    setTimeout(() => {
+      this.planDetail.reservationList.forEach((item) => {
+        item.status = "已预约";
+      });
+      this.$message.success('预约状态已更新');
+    }, 5000);
 
     // TODO: 显示酒店的marker
   },

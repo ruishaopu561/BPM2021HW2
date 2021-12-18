@@ -4,12 +4,12 @@
     <br />
     <!-- // FIXME: 地图div会和展开的navigation重叠，导致用不了navigation -->
     <div id="container2"></div>
-    <div>
+    <!-- <div>
       POI:
       <span>{{
         curPoi.name + "(" + curPoi.latLng.lat + "," + curPoi.latLng.lng + ")"
       }}</span>
-    </div>
+    </div> -->
     <a-card v-if="activeMarker !== null" hoverable style="width: 100%">
       <img slot="cover" :src="activeMarker.img" />
       <detail-list :title="activeMarker.username" :col="1">

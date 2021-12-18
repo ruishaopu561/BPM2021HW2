@@ -38,12 +38,12 @@
     <br />
     <!-- // FIXME: 地图div会和展开的navigation重叠，导致用不了navigation -->
     <div id="container"></div>
-    <div>
+    <!-- <div>
       POI:
       <span>{{
         curPoi.name + "(" + curPoi.latLng.lat + "," + curPoi.latLng.lng + ")"
       }}</span>
-    </div>
+    </div> -->
     <a-row type="flex" justify="space-around" align="middle">
       <a-col>
         <a-button type="primary" @click="nextStep">{{
