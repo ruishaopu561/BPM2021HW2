@@ -371,9 +371,9 @@ export default {
       console.log(this.searchForm.desc)
       var key = this.searchForm.storename
       if (key != '') {
-        this.dataSource = dataList.filter(item => item.storename === key)
+        this.historyDataSource = historyDataList.filter(item => item.storename === key)
       } else {
-        this.dataSource = dataList
+        this.historyDataSource = historyDataList
       }
     },
     reset() {

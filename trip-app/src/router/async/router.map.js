@@ -50,6 +50,10 @@ const routerMap = {
     name: '计划详情',
     component: () => import('@/pages/dashboard/queuePlan/PlanDetail')
   },
+  historyDetail: {
+    name: '旅程回放',
+    component: () => import('@/pages/dashboard/queuePlan/HistoryDetail')
+  },
   form: {
     name: '表单页',
     icon: 'form',

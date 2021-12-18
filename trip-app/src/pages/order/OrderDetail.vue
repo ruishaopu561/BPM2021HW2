@@ -1,7 +1,7 @@
 <template>
   <a-card style="margin-top: 16px" :bordered="false">
     <detail-list :col="1">
-      <detail-list-item term="订单编号">{{ data.no }}</detail-list-item>
+      <!-- <detail-list-item term="订单编号">{{ data.no }}</detail-list-item> -->
       <detail-list-item v-if="data.username" term="用户名称">{{ data.username }}</detail-list-item>
       <detail-list-item v-if="data.storename" term="商家名称">{{ data.storename }}</detail-list-item>
       <detail-list-item term="订房类型">{{ data.type }}</detail-list-item>

@@ -115,6 +115,12 @@ const options = {
               component: () =>
                 import("@/pages/dashboard/queuePlan/HistoryPlan"),
             },
+            {
+              path: "historyDetail",
+              name: "旅程回放",
+              component: () =>
+                import("@/pages/dashboard/queuePlan/HistoryDetail"),
+            },
           ],
         },
         {
