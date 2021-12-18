@@ -193,7 +193,7 @@ export default {
     }
   },
   methods: {
-    ...mapMutations('order', ['setDetail']),
+    ...mapMutations("order", ["setHistory", "setDetail"]),
     deleteRecord(key) {
       dataList = dataList.filter(item => item.key !== key)
       this.dataSource = dataList
@@ -257,13 +257,15 @@ export default {
     },
   },
   mounted() {
-    var that = this
-    setInterval(()=> {
-      let data = that.dataSource.filter(item => item.key === that.history.key)
-      if (data.length <= 0) {
-        that.dataSource.push(that.history)
-      }
-    }, 1000)
+    // var that = this
+  //   setInterval(()=> {
+  //     let data = that.dataSource.filter(item => item.key === that.history.key)
+  //     if (data.length <= 0) {
+  //       that.dataSource.push(that.history)
+  //     }
+  //   }, 1000)
+    this.dataSource.push(this.history)
+    this.setHistory({})
   }
 }
 </script>
